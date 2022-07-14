@@ -1,11 +1,12 @@
 <?php
-
+require_once('Session.php');
 class DB
 {
   private static $pdo;
 
   public static function instanceDb()
   {
+
     if (!isset(self::$pdo)) {
       try {
         $env = parse_ini_file('.env');

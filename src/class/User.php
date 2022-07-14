@@ -50,12 +50,12 @@ class User extends Crud
     if (!$user) {
 
       $dataRegistration = date('Y-m-d H:i:s');
-      $passwordCript = sha1($this->password);
+      $passwordCrypt = sha1($this->password);
 
       $query = "INSERT INTO $this->table VALUES (NULL, ?,?,?,?,?,?,?,?)";
       $query = DB::prepare($query);
       return $query->execute(array(
-        $this->name, $this->email, $passwordCript, $this->passwordRescue,
+        $this->name, $this->email, $passwordCrypt, $this->passwordRescue,
         $this->token, $this->codConfirm, $this->status, $dataRegistration
       ));
     } else {
