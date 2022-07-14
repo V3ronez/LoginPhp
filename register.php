@@ -1,6 +1,8 @@
 <?php
 require_once('./config/DB.php');
-require_once('./autload.php');
+require_once('./src/class/Crud.php');
+require_once('./src/class/User.php');
+require_once('./src/class/Validate.php');
 
 if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['password-repeated'])) {
 
@@ -10,11 +12,22 @@ if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])
   $passwordRepeated = Validade::validate($_POST['password-repeated']);
 
   if (empty($name) || empty($email) || empty($password) || empty($passwordRepeated) || empty($_POST['checkbox'])) {
-    $error = "Todos os campos são obrigatórios!";
+    $error = 'Todos os campos são obrigatórios!';
   } else {
     $user = new User($name, $email, $password);
+
+    $user->setPassowrdRepeated($passwordRepeated);
+    $user->ValidateRegister();
+
+    if (empty($user->erro)) {
+      $user->insert();                    //return no insert para que seja feito o redirect
+      header('location: index.php');
+    } else {
+      $errorInsert = $user->erro['errorInsert'];
+    }
   }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -32,24 +45,43 @@ if (isset($_POST['name']) && isset($_POST['email']) && isset($_POST['password'])
 <body>
   <form method="post" action="#">
     <h2>Cadastrar</h2>
-    <?php if (isset($error)) { ?><div class="erro-geral animate__animated animate__fadeInDown"><?php echo $error; ?></div> <?php } ?>
-
+    <?php if (isset($error)) { ?>
+      <?php echo '<div class="erro-geral animate__animated animate__fadeInDown">' . $error . '</div>' ?>
+    <?php } ?>
+    <?php if (isset($errorInsert)) { ?>
+      <?php echo '<div class="erro-geral animate__animated animate__fadeInDown">' . $errorInsert . '</div>' ?>
+    <?php } ?>
     <div class="input-group">
-      <img class="input-icon" src="public/assets/images/carteira-de-identidade.png" alt="nome-image">
-      <input type="text" name="name" placeholder="Digite seu nome: " id="">
-      <div class="erro-input"></div>
+      <img class="input-icon" src="public/assets/images/carteira-de-identidade.png">
+      <input type="text" name="name" <?php if (isset($_POST['name'])) {
+                                        echo 'value="' . $_POST['name'] . '"';
+                                      } ?> placeholder="Digite seu nome: " id="">
+      <?php if (isset($user->erro['nameErr'])); { ?>
+        <div class="erro-input"><?php echo ($user->erro['nameErr']); ?></div>
+      <?php } ?>
     </div>
     <div class="input-group">
       <img class="input-icon" src="public/assets/images/perto.png" alt="email-image">
-      <input type="email" name="email" placeholder="Digite seu email: exemplo@contato.com.br" id="">
+      <input type="email" name="email" <?php if (isset($_POST['email'])) {
+                                          echo 'value="' . $_POST['email'] . '"';
+                                        } ?> placeholder="Digite seu email: exemplo@contato.com.br" id="">
+      <?php if (isset($user->erro['emailErr'])); { ?>
+        <div class="erro-input"><?php echo ($user->erro['emailErr']); ?></div>
+      <?php } ?>
     </div>
     <div class="input-group">
       <img class="input-icon" src="public/assets/images/chave.png" alt="login-image">
       <input type="password" name="password" placeholder="Digite sua senha" id="">
+      <?php if (isset($user->erro['passwordErr'])); { ?>
+        <div class="erro-input"><?php echo ($user->erro['passwordErr']); ?></div>
+      <?php } ?>
     </div>
     <div class="input-group">
       <img class="input-icon" src="public/assets/images/chave.png" alt="login-image">
       <input type="password" name="password-repeated" placeholder="Digite sua senha novamente" id="">
+      <?php if (isset($user->erro['passwordRepeatedErr'])); { ?>
+        <div class="erro-input"><?php echo ($user->erro['passwordRepeatedErr']); ?></div>
+      <?php } ?>
     </div>
     <div class="input-group">
       <input type="checkbox" name="checkbox" value="checked" id="terms">

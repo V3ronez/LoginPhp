@@ -10,24 +10,24 @@ abstract class Crud extends DB
 
   public function find($id)
   {
-    $sql = "SELECT * FROM $this->table WHERE id=?";
-    $sql = DB::prepare($sql);
-    $sql->execute(array($id));
-    $response = $sql->fetch();
+    $query = "SELECT * FROM $this->table WHERE id=?";
+    $query = DB::prepare($query);
+    $query->execute(array($id));
+    $response = $query->fetch();
     return $response;
   }
   public function findAll()
   {
-    $sql = "SELECT * from $this->table";
-    $sql = DB::prepare($sql);
-    $response = $sql->fetchAll();
+    $query = "SELECT * from $this->table";
+    $query = DB::prepare($query);
+    $response = $query->fetchAll();
     return $response;
   }
 
   public function delete($id)
   {
-    $sql = "DELETE from $this->table WHERE id=?";
-    $sql = DB::prepare($sql);
-    return $sql->execute(array($id));
+    $query = "DELETE from $this->table WHERE id=?";
+    $query = DB::prepare($query);
+    return $query->execute(array($id));
   }
 }

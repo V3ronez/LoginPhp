@@ -2,7 +2,7 @@
 
 class Validade
 {
-  public static function validate($value): string
+  public static function validate($value)
   {
     $value = trim($value);
     $value = htmlspecialchars($value);
